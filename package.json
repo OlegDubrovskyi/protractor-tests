@@ -1,0 +1,15 @@
+{
+  "name": "www.ng-book.com",
+  "scripts": {
+    "pree2e": "node ./node_modules/protractor/bin/webdriver-manager update --versions.chrome 80.0.3987.16",
+    "e2e-tests": "protractor protractor.conf.js"
+  },
+  "devDependencies": {
+    "@types/jasmine": "2.8.16",
+    "jasmine": "3.4.0",
+    "jasmine-spec-reporter": "4.2.1",
+    "protractor": "5.4.3",
+    "typescript": "2.9.2",
+    "ts-node": "5.0.1"
+  }
+}
