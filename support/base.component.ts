@@ -16,6 +16,10 @@ export abstract class BaseComponent {
         await browser.wait(ExpectedConditions.elementToBeClickable(element), 8000);
     }
 
+    async waitForInvisible(element: ElementFinder) {
+        await browser.wait(ExpectedConditions.invisibilityOf(element), 8000);
+    }
+
     async waitForVisible(element: ElementFinder) {
         await browser.wait(ExpectedConditions.visibilityOf(element), 8000);
     }
