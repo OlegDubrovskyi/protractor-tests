@@ -26,7 +26,7 @@ exports.config = {
             project: 'tsconfig.json'
         });
         browser.manage().window().maximize();
-        browser.waitForAngularEnabled(false);
+        browser.waitForAngularEnabled(true);
         jasmine.getEnv().addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
     },
 };

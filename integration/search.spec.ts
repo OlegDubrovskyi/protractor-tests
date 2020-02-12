@@ -1,6 +1,7 @@
 import {LoginPo} from "../support/login.po";
 import {HeaderPo} from "../support/header.po";
 import {ProfilePo} from "../support/profile.po";
+import {browser} from "protractor";
 
 describe('Tests for login', async () => {
     const loginPage = new LoginPo();
@@ -8,48 +9,43 @@ describe('Tests for login', async () => {
     const profilePage = new ProfilePo();
 
     beforeAll(async () => {
-        await loginPage.navigateTo();
-        loginPage.inputEmail.sendKeys('anton.olkhovskyi@valor-software.com');
-        loginPage.inputPassword.sendKeys('bc?+c6QW@Cpv6u&');
-        loginPage.btnLogin.click();
-        await loginPage.waitForUrlContains('/dashboard');
+        await loginPage.logIn();
     });
 
-    fit('login', async () => {
-        let arr = ['node.js', 'Typescript', 'Angular.js'];
-        headerComponent.userSettings.click();
+    beforeEach(async () => {
+        await headerComponent.navigateTo();
+        await headerComponent.userSettings.click();
         await headerComponent.waitForClickable(headerComponent.menuViewProfile);
-        headerComponent.menuViewProfile.click();
-        await profilePage.waitForVisible(profilePage.btnEditSkills);
-        profilePage.btnEditSkills.click();
+        await headerComponent.menuViewProfile.click();
+        await profilePage.waitForVisible(profilePage.btnAddSkills);
+        await profilePage.btnAddSkills.click();
         await profilePage.waitForVisible(profilePage.inputSearchSkills);
-        arr.forEach(await (el => {
+
+    });
+
+    it('Test Case #4', async () => {
+        let skills = ['node.js', 'Typescript', 'Angular.js'];
+        skills.forEach(await (el => {
             profilePage.inputSearchSkills.clear();
             profilePage.inputSearchSkills.sendKeys(el);
             profilePage.waitForClickable(profilePage.searchResult(el));
-            expect(profilePage.checkBoxSearchResult.getText()).toContain(el);
+            expect( profilePage.checkBoxSearchResult.getText()).toContain(el);
             profilePage.searchResult(el).click();
             profilePage.waitForClickable(profilePage.selectedSkills.get(0));
-            expect(profilePage.selectedSkillsByName(el).count()).toBeGreaterThan(0);
+            expect( profilePage.selectedSkillsByName(el).count()).toBeGreaterThan(0);
         }));
         await profilePage.btnSave.click();
         await profilePage.waitForClickable(profilePage.btnEditSkills);
         profilePage.btnEditSkills.click();
-        await profilePage.waitForClickable(profilePage.inputSearchSkills);
-        arr.forEach(await (async el => {
+        await profilePage.waitForVisible(profilePage.removeSelectedSkills.get(0));
+        skills.forEach(await (async el => {
             expect(await profilePage.selectedSkillsByName(el).count()).toBeGreaterThan(0);
         }));
     });
 
-    it('login', async () => {
-        let arr = ['SEO', 'MySQL', 'HTML5'];
-        headerComponent.userSettings.click();
-        await headerComponent.waitForClickable(headerComponent.menuViewProfile);
-        headerComponent.menuViewProfile.click();
-        await profilePage.waitForClickable(profilePage.btnEditSkills);
-        profilePage.btnEditSkills.click();
-        await profilePage.waitForClickable(profilePage.inputSearchSkills);
-        arr.forEach(await (async el => {
+    it('Test Case #5', async () => {
+        let skills = ['SEO', 'MySQL', 'HTML5'];
+        skills.forEach(await (async el => {
             profilePage.inputSearchSkills.clear();
             profilePage.inputSearchSkills.sendKeys(el);
             await profilePage.waitForClickable(profilePage.searchResult(el));
@@ -62,17 +58,31 @@ describe('Tests for login', async () => {
         await profilePage.waitForClickable(headerComponent.btnFilters);
         headerComponent.btnFilters.click();
         await headerComponent.waitForInvisible(headerComponent.btnFilters);
-        arr.forEach(await (async el => {
+        skills.forEach(await (async el => {
             expect(await headerComponent.checkBoxItems(el).isDisplayed()).toContain(true);
         }));
     });
-    // afterAll(async () => {
-    //     await browser.wait(ExpectedConditions.elementToBeClickable($$('.InputContainer .NativeElementContainer input').get(1)), 5000);
-    //     await arr.forEach((el, index) =>{
-    //         if(element.all(by.cssContainingText('.SelectedSkillsContainer span', el)).isDisplayed()){
-    //             $$('fl-picture.CloseIcon').get(index).click();
-    //         }
-    //     });
-    //     await $('[fltrackinglabel="SaveSkillsButton"]').click();
-    // });
+
+    afterEach(async () => {
+        await browser.refresh();
+        await headerComponent.userSettings.click();
+        await headerComponent.waitForClickable(headerComponent.menuViewProfile);
+        headerComponent.menuViewProfile.click();
+        if (profilePage.btnEditSkills.isDisplayed()) {
+            await profilePage.btnEditSkills.click();
+            await profilePage.waitForVisible(profilePage.removeSelectedSkills.get(0));
+            await profilePage.removeSelectedSkills.each((async el => {
+                await el.click();
+            }));
+            await profilePage.btnSave.click();
+            await browser.refresh();
+        }
+    });
+
+    afterAll(async () => {
+        await browser.refresh();
+        await headerComponent.userSettings.click();
+        await headerComponent.waitForClickable(headerComponent.btnLogOut);
+        await headerComponent.btnLogOut.click();
+    });
 });
